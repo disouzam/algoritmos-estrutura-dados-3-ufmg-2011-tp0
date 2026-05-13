@@ -1,0 +1,34 @@
+# depslib dependency file v1.0
+1314581935 source:/home/disouzam/Documentos/TP0_v2/bignum.c
+	"bignum.h"
+
+1314575739 /home/disouzam/Documentos/TP0_v2/bignum.h
+	<stdlib.h>
+	<stdio.h>
+	<math.h>
+	"digit.h"
+	"list.h"
+
+1314150358 /home/disouzam/Documentos/TP0_v2/digit.h
+	<stdlib.h>
+	<stdio.h>
+
+1314505639 /home/disouzam/Documentos/TP0_v2/list.h
+	<stdlib.h>
+	<stdio.h>
+	"digit.h"
+
+1314581931 source:/home/disouzam/Documentos/TP0_v2/digit.c
+	"digit.h"
+
+1314559562 source:/home/disouzam/Documentos/TP0_v2/list.c
+	"list.h"
+
+1314581950 source:/home/disouzam/Documentos/TP0_v2/main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"digit.h"
+	"list.h"
+	"bignum.h"
+
