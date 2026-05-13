@@ -46,4 +46,10 @@ typedef struct digit DIGIT;
 		//Recupera o valor armazenado em next_;
 		DIGIT* get_next(DIGIT* d);
 
+
+
+//Impressão dos valores armazenados no TAD digit. 
+//Função criada para fins de depuração e/ou observação do comportamento dos TAD's dependentes.
+void print_info(DIGIT* d);
+
 #endif // DIGIT_H
