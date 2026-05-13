@@ -1,16 +1,21 @@
+/*****************************************************/
+/* Autor: Dickson Alves de Souza                     */
+/* Aluno do curso de Engenharia Metalúrgica - UFMG   */
+/*                                                   */
+/* Data: 29 de agosto de 2011                        */
+/*                                                   */
+/* TAD bignum: implementação                         */
+/*                                                   */
+/*****************************************************/
+
 #include "bignum.h"
 
-void print_bignum_info(BIGNUM* A);
-
+//Funções auxiliares. Não fazem parte da interface do TAD
 void subtrair_aux(BIGNUM* A, BIGNUM* B);
 
 void multiplicar_aux(BIGNUM* A, BIGNUM* B);
 
 void dividir_aux(BIGNUM* A, BIGNUM* B);
-
-void fatorial(BIGNUM* A);
-
-int nulo(BIGNUM* A);
 
 //Retorna 1 se A for igual a 1
 //Retorna 0 se A for diferente de 1
@@ -22,12 +27,13 @@ int unitario(BIGNUM* A);
 BIGNUM* criar()
 {
 	BIGNUM* b;
+	//Teste alocação dinâmica de memória
 	b = (BIGNUM*) malloc (sizeof(struct bignum));
-
+	
 	if (b != NULL)
 	{
 		LIST* l;
-
+		
 		l = create_list();
 		b->list_num = l;
 		clear_list(l);
@@ -52,55 +58,67 @@ void destruir(BIGNUM** b)
 void ler_tela(BIGNUM* b)
 {
 	clear_list(b->list_num);
-
+	
 	char c;
 	c = getchar();
+	
 	while (c == ' ' || c == '\n')
 	{
 		c = getchar();
 	}
-
+	
 	if (c == '-')
 	{
 		b->sign = -1;
-	}else
+	}
+	else
 	{
 		b->sign = 1;
+		
 		if ((c >= '0') && (c <= '9'))
 		{
 			insert_end(b->list_num, c % 48);
 		}
 	}
-
+	
 	c = getchar();
+	
 	while((c >= '0') && (c <= '9'))
 	{
 		insert_end(b->list_num, c % 48);
 		c = getchar();
 	}
-
+	
 	return;
 } //void ler_tela(BIGNUM* b)
 
+
+//Escreve o valor armazenado em b em um arquivo apontado por outfile
 void escrever_texto(FILE* outfile, BIGNUM* b)
 {
 	DIGIT* iter = get_first(b->list_num);
-
+	
 	while (iter != NULL)
 	{
 		char iter_dig = get_dig(iter);
+		
 		iter_dig = iter_dig + 48;
 		putc(iter_dig , outfile);
 		iter = get_next(iter);
 	}
 	putc(EOF, outfile);
+	
+	return;
 }
 
+//Ler um número localizado em um arquivo texto
 void ler_texto(FILE* infile, BIGNUM* b)
 {
 	clear_list(b->list_num);
 	int ch;
+	
 	ch = getc(infile);
+	
 	while (ch != ' ' && ch != '\n')
 	{
 		insert_end(b->list_num , ch % 48);
@@ -108,6 +126,8 @@ void ler_texto(FILE* infile, BIGNUM* b)
 	}
 	printf("\nNúmero lido do arquivo:");
 	imprimir(b , 0);
+	
+	return;
 }
 
 // Copia o número armazenado em B para o número A
@@ -115,9 +135,9 @@ void copiar(BIGNUM* A, BIGNUM *B)
 {
 	clear_list(A->list_num);
 	A->sign = B->sign;
-
+	
 	DIGIT* b = get_first(B->list_num);
-
+	
 	while (b != NULL)
 	{
 		insert_end(A->list_num, get_dig(b));
@@ -125,7 +145,7 @@ void copiar(BIGNUM* A, BIGNUM *B)
 	}
 }
 
-//Determina qual módulo é maior.
+//Determina qual módulo é maior. 
 //Retorna 1 se |A| >= |B|
 //Retorna 0 se |A| < |B|
 int maior_modulo(BIGNUM* A, BIGNUM* B)
@@ -144,13 +164,13 @@ int maior_modulo(BIGNUM* A, BIGNUM* B)
 		{
 			DIGIT* a = get_first(A->list_num);
 			DIGIT* b = get_first(B->list_num);
-
+			
 			while ((get_next(a) != NULL) && (get_dig(a) == get_dig(b)))
 			{
 				a = get_next(a);
 				b = get_next(b);
 			}
-
+			
 			if (get_dig(a) >= get_dig(b))
 			{
 				return (1);
@@ -166,55 +186,49 @@ int maior_modulo(BIGNUM* A, BIGNUM* B)
 //O valor do bignum B é somado ao valor do bignum A e o resultado fica armazenado em A
 void somar(BIGNUM* A, BIGNUM* B)
 {
-	/*
-	printf("\nA:");
-	print_bignum_info(A);
-	printf("\nB:");
-	print_bignum_info(B);
-	*/
 	if (get_size(A->list_num) >= 1 && get_size(B->list_num) >= 1)
 	{
 		if (A->sign == B->sign)
 		{
 			DIGIT* a = get_last(A->list_num);
 			DIGIT* b = get_last(B->list_num);
-
+			
 			char a_dig = 0;
 			char b_dig = 0;
-
+			
 			char c = 0;
 			char d = 0;
 			char e = 0;
-
+			
 			if (get_size(A->list_num) >= get_size(B->list_num))
 			{
 				while (b != NULL)
 				{
 					a_dig = get_dig(a);
 					b_dig = get_dig(b);
-
+					
 					c = a_dig + b_dig + e;
 					d = c % 10;
 					e = c / 10;
-
+					
 					set_dig(a , d);
-
+					
 					a = get_previous(a);
 					b = get_previous(b);
 				}
-
+				
 				while (a != NULL)
 				{
 					a_dig = get_dig(a);
 					c = a_dig + e;
 					d = c % 10;
 					e = c / 10;
-
+					
 					set_dig(a , d);
-
+					
 					a = get_previous(a);
 				}
-
+				
 				if (e != 0)
 				{
 					insert_begin(A->list_num , e);
@@ -224,38 +238,38 @@ void somar(BIGNUM* A, BIGNUM* B)
 			{
 				char a_dig = 0;
 				char b_dig = 0;
-
+				
 				char c = 0;
 				char d = 0;
 				char e = 0;
-
+					
 				while (a != NULL)
 				{
 					a_dig = get_dig(a);
 					b_dig = get_dig(b);
-
+					
 					c = a_dig + b_dig + e;
 					d = c % 10;
 					e = c / 10;
-
+					
 					set_dig(a , d);
-
+					
 					a = get_previous(a);
 					b = get_previous(b);
 				}
-
+				
 				while (b != NULL)
 				{
 					b_dig = get_dig(b);
 					c = b_dig + e;
 					d = c % 10;
 					e = c / 10;
-
+					
 					insert_begin(A->list_num , d);
-
+					
 					b = get_previous(b);
 				}
-
+				
 				if (e != 0)
 				{
 					insert_begin(A->list_num , e);
@@ -266,9 +280,9 @@ void somar(BIGNUM* A, BIGNUM* B)
 		{
 			BIGNUM* C = criar();
 			copiar(C , B);
-
+			
 			int m = maior_modulo(A , C);
-
+			
 			if (m == 1)
 			{
 				subtrair_aux(A, C);
@@ -278,7 +292,7 @@ void somar(BIGNUM* A, BIGNUM* B)
 				subtrair_aux(C, A);
 				copiar(A , C);
 			}
-
+		
 			destruir(&C);
 		}
 	}
@@ -294,16 +308,16 @@ void subtrair(BIGNUM* A, BIGNUM* B)
 {
 	BIGNUM* C = criar();
 	copiar(C , B);
-
+	
 	if (A->sign != C->sign)
 	{
 		negativo(C);
-		//print_bignum_info(C);
 		somar(A , C);
 	}
 	else
 	{
 		int m = maior_modulo(A , C);
+		
 		if (m == 1)
 		{
 			subtrair_aux(A , C);
@@ -319,7 +333,7 @@ void subtrair(BIGNUM* A, BIGNUM* B)
 	return;
 } //void subtrair(BIGNUM* A, BIGNUM* B)
 
-// Imprime o número armazenado em bignum na tela usando o ponto como separador de milhar.
+// Imprime o número armazenado em bignum na tela usando o ponto como separador de milhar. 
 // Números gigantes podem requerer a impressão em múltiplas linhas.
 // O flag sci serve para selecionar a impressão ao final do número de sua versão aproximada em notação científica:
 // sci = 0                                        -> Não imprime a notação científica ao final.
@@ -327,25 +341,25 @@ void subtrair(BIGNUM* A, BIGNUM* B)
 void imprimir(BIGNUM* A, char sci)
 {
 	unsigned long int s = get_size(A->list_num);
-
+	
 	if((A->sign) == -1)
 	{
 		printf("-");
 	}
 	print_list(A->list_num);
-
+	
 	DIGIT* temp = get_first(A->list_num);
-
+	
 	if (sci == 1)
 	{
 		printf("   Notação científica: ");
-
+		
 		if (A->sign == -1)
 		{
 			printf("-");
 		}
 		printf("%d.", get_dig(temp));
-
+		
 		if (s == 1)
 		{
 			printf("00E0 ");
@@ -365,8 +379,8 @@ void imprimir(BIGNUM* A, char sci)
 				printf("%dE%ld",get_dig(temp), s - 1);
 			}
 		}
-
 	}
+	return;
 }
 
 // Altera o sinal de A, fazendo A = -A
@@ -377,25 +391,25 @@ void negativo (BIGNUM* A)
 }
 
 
-// Realiza a subtração A - B e armazena o resultado obtido em A. B não é alterado.
+// Realiza a subtração A - B e armazena o resultado obtido em A. B não é alterado. 
 // Os sinais não são considerados na operação e |A| >= |B|.
 // A operação executada é sign(A) * (|A| - |B|)
 void subtrair_aux(BIGNUM* A, BIGNUM* B)
 {
 	DIGIT* a = get_last(A->list_num);
 	DIGIT* b = get_last(B->list_num);
-
+	
 	char a_dig = 0;
 	char b_dig = 0;
-
+	
 	char c = 0;
 	char d = 0;
-
+	
 	while (b != NULL)
 	{
 		a_dig = get_dig(a);
 		b_dig = get_dig(b);
-
+		
 		if (d == 1)
 		{
 			if (a_dig == 0)
@@ -407,7 +421,7 @@ void subtrair_aux(BIGNUM* A, BIGNUM* B)
 				d = 0;
 			}
 		}
-
+		
 		if (a_dig >= b_dig)
 		{
 			c = a_dig - b_dig;
@@ -417,17 +431,17 @@ void subtrair_aux(BIGNUM* A, BIGNUM* B)
 			c = (10 + a_dig) - b_dig - d;
 			d = 1;
 		}
-
+		
 		set_dig(a , c);
-
+		
 		a = get_previous(a);
 		b = get_previous(b);
 	}
-
+	
 	while (a != NULL && d == 1)
 	{
 		a_dig = get_dig(a);
-
+		
 		if (a_dig == 0)
 		{
 			a_dig = 9;
@@ -436,14 +450,14 @@ void subtrair_aux(BIGNUM* A, BIGNUM* B)
 			a_dig = a_dig - 1;
 			d = 0;
 		}
-
+		
 		set_dig(a , a_dig);
 		a = get_previous(a);
 	}
-
+	
 	a = get_first(A->list_num);
 	a_dig = get_dig(a);
-
+	
 	while ((get_size(A->list_num) > 1) && (a_dig == 0))
 	{
 		DIGIT* temp = get_next(a);
@@ -451,18 +465,19 @@ void subtrair_aux(BIGNUM* A, BIGNUM* B)
 		a = temp;
 		a_dig = get_dig(a);
 	}
-
+	return;
+	
 }
 
-//
+// Multiplica o número A pelo número B e armazena o resultado em A
 void multiplicar(BIGNUM* A, BIGNUM* B)
 {
 	unsigned long int size_a = get_size(A->list_num);
 	unsigned long int size_b = get_size(B->list_num);
-
+	
 	char a_dig = get_dig(get_first(A->list_num));
 	char b_dig = get_dig(get_first(B->list_num));
-
+	
 	if (((size_a == 1) && (a_dig == 0 || a_dig == 1)) || ((size_b == 1) && (b_dig == 0 || b_dig == 1)))
 	{
 		if ((size_a == 1 && a_dig == 0) || (size_b == 1 && b_dig == 0))
@@ -471,7 +486,7 @@ void multiplicar(BIGNUM* A, BIGNUM* B)
 			A->sign = 1;
 			insert_begin(A->list_num, 0);
 		}
-
+		
 		if ((size_a == 1 && a_dig == 1) || (size_b == 1 && b_dig == 1))
 		{
 			if (size_a == 1 && a_dig == 1)
@@ -485,15 +500,14 @@ void multiplicar(BIGNUM* A, BIGNUM* B)
 	else
 	{
 		char s = (A->sign) * (B->sign);
-
+		
 		int m = maior_modulo(A, B);
-
+		
 		BIGNUM* temp = criar();
-
+		
 		if (m == 0)
 		{
 			copiar(temp, B);
-
 			multiplicar_aux(temp, A);
 		}
 		else
@@ -502,9 +516,9 @@ void multiplicar(BIGNUM* A, BIGNUM* B)
 			multiplicar_aux(temp, B);
 		}
 		copiar(A, temp);
-
+		
 		A->sign = s;
-
+		
 		destruir(&temp);
 	}
 	return;
@@ -519,282 +533,68 @@ void multiplicar_aux(BIGNUM* A, BIGNUM* B)
 {
 	BIGNUM* ACUM = criar();
 	insert_end(ACUM->list_num , 0);
-
+	
 	BIGNUM* TRANSIT = criar();
-
+	
 	DIGIT* b = get_last(B->list_num);
-
+	
 	char a_dig = 0;
-	char b_dig = 0;
-
+	char b_dig = 0; 
+	
 	unsigned long int i = 0;
-
+	
 	while (b != NULL)
 	{
 		DIGIT* a = get_last(A->list_num);
 		clear_list(TRANSIT->list_num);
-
+		
 		b_dig = get_dig(b);
-
+		
 		char d = 0;
 		char e = 0;
 		char f = 0;
-
+		
 		while(a != NULL)
 		{
 			a_dig = get_dig(a);
-
+			
 			d = a_dig * b_dig + f;
 			e = d % 10;
 			f = d / 10;
-
+			
 			insert_begin(TRANSIT->list_num , e);
-
+			
 			a = get_previous(a);
 		}
-
+		
 		if (f != 0)
 		{
 			insert_begin(TRANSIT->list_num , f);
 		}
-
+		
 		unsigned long int j;
 		for (j = 0; j < i; j++)
 		{
 			insert_end(TRANSIT->list_num, 0);
 		}
-
+		
 		somar(ACUM, TRANSIT);
 		b = get_previous(b);
 		i++;
 	}
 	copiar(A , ACUM);
-
+	
 	destruir(&ACUM);
 	destruir(&TRANSIT);
-
+	return;
 }
 
-//Função de manutenção do TAD bignum. Verifica o bom funcionamento de suas funções.
-void debug_bignum()
-{
-	/*
-	printf ("\nTeste e depuração do TAD bignum\n");
 
-	BIGNUM* b = criar();
-	printf("\nTeste do construtor\n");
-	printf("Endereço de b = %p\n", &b);
-	printf("Ponteiro b para bignum = %p\n", b);
-	destruir(&(b));
-	printf("\nTeste do destrutor\n");
-	printf("Endereço de b = %p\n", &b);
-	printf("Ponteiro b para bignum = %p\n", b);
-
-	char r = 's';
-	char* r_ptr = &r;
-
-	BIGNUM* c = criar();
-	BIGNUM* d = criar();
-
-	while (r == 's')
-	{
-		printf ("\nInsira dois números:\n");
-
-		ler_tela(c);
-		imprimir(c , 1);
-		printf("\n\n");
-		ler_tela(d);
-		imprimir(d , 1);
-		printf("\n\n");
-
-		if (maior_modulo(c,d) == 1)
-		{
-			printf("\nPrimeiro número é maior\n");
-		}
-		else
-		{
-			printf("\nSegundo número é maior\n");
-		}
-
-		printf("\nDeseja repetir o teste? (s/n)");
-		scanf("%c", r_ptr);
-	}
-
-
-
-	printf("\nTeste da função somar\n");
-	char ans = 's';
-	char* ans_ptr = &ans;
-
-	while (ans == 's')
-	{
-		printf ("\nInsira dois números:\n");
-		ler_tela(c);
-		ler_tela(d);
-		somar(c , d);
-		printf ("\nResultado c + d = ");
-		imprimir(c , 1);
-		printf("\nDeseja repetir o teste? (s/n)");
-		scanf("%s", ans_ptr);
-	}
-
-
-	char ans2 = 's';
-	char* ans2_ptr = &ans2;
-
-	BIGNUM* F = criar();
-	BIGNUM* G = criar();
-
-	printf("\nTeste da função subtrair\n");
-	ans2 = 's';
-	while (ans2 == 's')
-	{
-		printf ("\nInsira dois números:\n");
-		ler_tela(F);
-		ler_tela(G);
-		subtrair(F , G);
-		printf ("\nResultado c + d = ");
-		imprimir(F , 1);
-		printf("\nDeseja repetir o teste? (s/n)");
-		scanf("%s", ans2_ptr);
-	}
-
-	destruir(&c);
-	destruir(&d);
-
-
-	//Teste da função copiar
-	BIGNUM* E = criar();
-	printf("\nLer E:");
-	ler_tela(E);
-	printf("\nImprimir E:");
-	imprimir(E , 1);
-	BIGNUM* H = criar();
-	printf("\nLer H:");
-	ler_tela(H);
-	imprimir(H , 1);
-	copiar(H , E);
-	printf("\nImprimir E depois da cópia para H:");
-	imprimir(E , 1);
-	printf("\nImprimir H depois da cópia de E para H:");
-	imprimir(H, 1);
-
-	negativo(E);
-	printf("\n");
-	imprimir(E , 1);
-
-	negativo(E);
-	printf("\n");
-	imprimir(E , 1);
-
-	negativo(E);
-	printf("\n");
-	imprimir(E , 1);
-
-
-
-	//Teste da função multiplicar
-
-	char ans3 = 's';
-	char* ans3_ptr = &ans3;
-
-	BIGNUM* M1 = criar();
-	BIGNUM* M2 = criar();
-
-	printf("\nTeste da função MULTIPLICAR\n");
-	ans3 = 's';
-	while (ans3 != 'n')
-	{
-		printf ("\nInsira dois números:\n");
-		ler_tela(M1);
-		ler_tela(M2);
-		multiplicar(M1 , M2);
-		printf ("\nResultado M1 * M2 = ");
-		imprimir(M1 , 1);
-		printf("\nDeseja repetir o teste? (s/n)");
-		scanf("%s", ans3_ptr);
-	}
-
-	int cont1 = 0;
-	int cont2 = 0;
-	BIGNUM* A = criar();
-	BIGNUM* B = criar();
-	BIGNUM* temp = criar();
-
-	for (cont1 = 0; cont1 < 10; cont1++)
-	{
-		long_to_big(A, cont1);
-
-		for (cont2 = 0; cont2 < 100 ; cont2++)
-		{
-			copiar(temp, A);
-			long_to_big(B , cont2);
-			printf ("\n");
-			imprimir(A , 0);
-			printf(" X ");
-			imprimir(B , 0);
-			printf(" = ");
-			multiplicar(temp , B);
-			imprimir(temp , 0);
-		}
-	}
-
-
-
-	printf("\nTeste da função DIVIDIR\n");
-	//Teste da função dividir
-
-	BIGNUM* D1 = criar();
-	BIGNUM* D2 = criar();
-
-	char ans4 = 's';
-	char* ans4_ptr = &ans4;
-
-	ans4 = 's';
-	while (ans4 != 'n')
-	{
-		printf ("\nInsira dois números:\n");
-		ler_tela(D1);
-		ler_tela(D2);
-		dividir(D1, D2);
-		printf ("\nResultado D1 / D2 = ");
-		imprimir(D1 , 1);
-		printf("\nDeseja repetir o teste? (s/n)");
-		scanf("%s", ans4_ptr);
-	}
-
-	*/
-
-	//Teste final
-	BIGNUM* T = criar();
-	BIGNUM* T2 = criar();
-	unsigned long int t = 0;
-
-	for (t = 0; t <= 10; t++)
-	{
-		printf("\nInsira dois números: ");
-		ler_tela(T);
-		ler_tela(T2);
-		combinacao(T, T2);
-		printf("\nA combinação entre os dois números inseridos é: \n");
-		imprimir(T , 1);
-		printf("\n");
-		printf("\nPressione ENTER para continuar.");
-
-
-		char c;
-		do
-		{
-			c = getchar();
-		}while (c != '\n');
-
-	}
-
-}
 
 void long_to_big(BIGNUM* A, unsigned long int b)
 {
 	clear_list(A->list_num);
+	
 	if (b >= 0)
 	{
 		A->sign = 1;
@@ -805,30 +605,31 @@ void long_to_big(BIGNUM* A, unsigned long int b)
 		b = -b;
 	}
 	unsigned long int c;
-
+	
 	while (b >= 10)
 	{
 		c = b % 10;
 		insert_begin(A->list_num, c);
 		b = b / 10;
 	}
+	
 	insert_begin(A->list_num, b);
 }
 
-// Operação de divisão inteira A / B.
+// Operação de divisão inteira A / B. 
 // A >= 0 e B >0
-// Se A >= B, o resultado, armazenado na variável A,
+// Se A >= B, o resultado, armazenado na variável A, 
 // é o maior inteiro que multiplicado por B resulta em um número menor ou igual a A
 // Se A < B, o resultado é igual a 0.
 void dividir(BIGNUM* A, BIGNUM* B)
 {
 	int m = maior_modulo(A , B);
-
+	
 	if (m == 0)
 	{
 		clear_list(A->list_num);
 		A->sign = 1;
-
+		
 		insert_begin(A->list_num , 0);
 	}
 	else
@@ -837,62 +638,48 @@ void dividir(BIGNUM* A, BIGNUM* B)
 	}
 }
 
+//Função auxiliar para executar a divisão
 void dividir_aux(BIGNUM* A, BIGNUM* B)
 {
 	unsigned long int size_a = get_size(A->list_num);
 	unsigned long int size_b = get_size(B->list_num);
-
+	
 	unsigned long int order, j;
-
+	
 	order = size_a - size_b;
-
+	
 	if (order != 0)
 	{
 		order = order - 1;
 	}
-
+	
 	BIGNUM* FATOR = criar();
 	insert_begin(FATOR->list_num, 1);
-
+	
 	BIGNUM* INCREMENT = criar();
-
+	
 	for (j = 0; j < order; j++)
 	{
 		insert_end(FATOR->list_num , 0);
 	}
-
+	
 	copiar(INCREMENT, FATOR);
-
+	
 	BIGNUM* PRODUTO = criar();
-
+	
 	int m;
-
+	
 	BIGNUM* UNIDADE = criar();
 	insert_begin(UNIDADE->list_num , 1);
-
+	
 	int f = igual(INCREMENT , UNIDADE);
-
+	
 	while (f == 0)
 	{
 		somar(FATOR, INCREMENT);
-		printf ("\n\nINCREMENTO = ");
-		imprimir (INCREMENT, 0);
-		printf ("\nFATOR INCREMENTADO = ");
-		imprimir (FATOR, 0);
 		copiar(PRODUTO, FATOR);
 		multiplicar(PRODUTO, B);
-		printf("\nPRODUTO = ");
-		imprimir(PRODUTO, 0);
-		printf("\nDIVIDENDO = ");
-		imprimir(A,0);
-		printf("\nDIVISOR = ");
-		imprimir(B,0);
-
-		printf("=== FIM do LOOP====\n\n");
-
-		long int u;
-		for (u = 0; u <= 100000000; u++);
-
+		
 		m = maior_modulo(PRODUTO, A);
 		if (m == 1)
 		{
@@ -903,48 +690,34 @@ void dividir_aux(BIGNUM* A, BIGNUM* B)
 				erase_digit(INCREMENT->list_num , &inc);
 			}
 		}
-
+		
 		f = igual(INCREMENT , UNIDADE);
 	}
-
+	
 	BIGNUM* PRODUTO2 = criar();
-
+	
 	copiar(PRODUTO, FATOR);
 	multiplicar(PRODUTO, B);
 	somar(FATOR , INCREMENT);
 	copiar(PRODUTO2, FATOR);
 	multiplicar(PRODUTO2, B);
-
+	
 	int p1, p2;
 	p1 = maior_modulo(PRODUTO , A);
 	p2 = maior_modulo(PRODUTO2 , A);
-
+	
 	while ((p1 + p2) == 0)
 	{
 		copiar(PRODUTO, PRODUTO2);
-		printf("\nPRODUTO = ");
-		imprimir(PRODUTO, 0);
 		somar(FATOR , INCREMENT);
 		copiar(PRODUTO2, FATOR);
 		multiplicar(PRODUTO2, B);
-		printf("\nPRODUTO2 = ");
-		imprimir(PRODUTO2, 0);
-		printf ("\nFATOR = ");
-		imprimir (FATOR, 0);
-  printf("\nDIVIDENDO = ");
-		imprimir(A,0);
-		printf("\nDIVISOR = ");
-		imprimir(B,0);
-
-		printf("\n\n");
-
-		long int u;
-		for (u = 0; u <= 100000000; u++);
-
+		
+		
 		p1 = maior_modulo(PRODUTO , A);
 		p2 = maior_modulo(PRODUTO2 , A);
 	}
-
+	
 	f = igual (PRODUTO2, A);
 	if (f == 0)
 	{
@@ -954,23 +727,6 @@ void dividir_aux(BIGNUM* A, BIGNUM* B)
 }
 
 
-void print_bignum_info(BIGNUM* A)
-{
-	//DEBUG
-	printf("Informações do listnum\n");
-	DIGIT* t = get_first(A->list_num);
-	unsigned long int i = 1;
-	printf("\nSinal = ");
-	printf("%d", A->sign);
-	while (t != NULL)
-	{
-		printf("\nNó número = %ld\n", i);
-		print_info(t);
-		t = get_next(t);
-		i++;
-	}
-	//DEBUG
-}
 
 
 //Função para verificar igual entre A e B
@@ -980,20 +736,20 @@ int igual (BIGNUM* A, BIGNUM* B)
 {
 	unsigned long int size_a = get_size(A->list_num);
 	unsigned long int size_b = get_size(B->list_num);
-
+	
 	if (size_a == size_b)
 	{
 		int sign_a = A->sign;
 		int sign_b = B->sign;
-
+		
 		if (sign_a == sign_b)
 		{
 			DIGIT* a = get_first(A->list_num);
 			DIGIT* b = get_first(B->list_num);
-
+			
 			char a_dig = get_dig(a);
 			char b_dig = get_dig(b);
-
+			
 			while ((get_next(a) != NULL) && (a_dig == b_dig))
 			{
 				a = get_next(a);
@@ -1001,7 +757,7 @@ int igual (BIGNUM* A, BIGNUM* B)
 				a_dig = get_dig(a);
 				b_dig = get_dig(b);
 			}
-
+			
 			if (a_dig == b_dig)
 			{
 				return (1);
@@ -1015,7 +771,7 @@ int igual (BIGNUM* A, BIGNUM* B)
 		{
 			return (0);
 		}
-
+		
 	}
 	else
 	{
@@ -1028,6 +784,7 @@ int igual (BIGNUM* A, BIGNUM* B)
 int unitario(BIGNUM* A)
 {
 	unsigned long int size_a = get_size(A->list_num);
+	
 	if (size_a == 1 && get_dig(get_first(A->list_num)) == 1)
 	{
 		return 1;
@@ -1043,6 +800,7 @@ int unitario(BIGNUM* A)
 int nulo(BIGNUM* A)
 {
 	unsigned long int size_a = get_size(A->list_num);
+	
 	if (size_a == 1 && get_dig(get_first(A->list_num)) == 0)
 	{
 		return 1;
@@ -1066,19 +824,22 @@ void fatorial(BIGNUM* A)
 	{
 		BIGNUM* iter = criar();
 		BIGNUM* UNIDADE = criar();
+		
 		insert_begin(UNIDADE->list_num , 1);
 		copiar(iter , A);
+		
 		subtrair(iter, UNIDADE);
-
+		
 		do
 		{
 			multiplicar(A, iter);
 			subtrair(iter, UNIDADE);
 		}while (maior_modulo(iter , UNIDADE) == 1);
-
+		
 		destruir(&iter);
 		destruir(&UNIDADE);
 	}
+	return;
 }
 
 // Calcula a combinação entre dois números.
@@ -1088,7 +849,7 @@ void combinacao(BIGNUM* A, BIGNUM* B)
 {
 	int n_a = nulo(A);
 	int n_b = nulo(B);
-
+	
 	if (n_a != 1 && n_b != 1)
 	{
 		int i = igual(A, B);
@@ -1103,38 +864,41 @@ void combinacao(BIGNUM* A, BIGNUM* B)
 			BIGNUM* iter = criar();
 			BIGNUM* UNIDADE = criar();
 			insert_begin(UNIDADE->list_num , 1);
-
+			
 			copiar(temp , A);
 			subtrair(temp , B);
+			
 			if ((maior_modulo(temp , B) == 1))
 			{
 				copiar(iter , A);
 				subtrair(iter, UNIDADE);
+				
 				while (igual(iter, temp) != 1)
 				{
 					multiplicar(A, iter);
 					subtrair(iter, UNIDADE);
 				}
-
+				
 				copiar(temp, B);
 				fatorial(temp);
 				dividir(A , temp);
-
+				
 			}
 			else
 			{
 				copiar(iter , A);
 				subtrair(iter, UNIDADE);
+				
 				while (igual(iter, B) != 1)
 				{
 					multiplicar(A, iter);
 					subtrair(iter, UNIDADE);
 				}
-
+				
 				fatorial(temp);
 				dividir(A , temp);
 			}
-
+			
 			destruir(&UNIDADE);
 			destruir(&iter);
 			destruir(&temp);
@@ -1156,4 +920,5 @@ void combinacao(BIGNUM* A, BIGNUM* B)
 			}
 		}
 	}
+	return;
 }

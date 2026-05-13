@@ -1,3 +1,13 @@
+/*****************************************************/
+/* Autor: Dickson Alves de Souza                     */
+/* Aluno do curso de Engenharia Metalúrgica - UFMG   */
+/*                                                   */
+/* Data: 29 de agosto de 2011                        */
+/*                                                   */
+/* Função principal para executar testes no          */
+/* bignum criado                                     */
+/*****************************************************/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -8,20 +18,17 @@
 
 int main(int argc , char* argv[])
 {
-	//debug_digit();
-	//debug_list();
-	//debug_bignum();
-	
-	#if 1
 	FILE *infile, *outfile;
 	
+	//Abre arquivo para leitura
 	infile = fopen(argv[1],"r");
 	
 	char* o = argv[1];
 	
+	//string para nome do arquivo de saída
 	char out[20];
 	int j = 0;
-	while (j < 20 && *o != '.')
+	while (j < 20 && (*o) != '.')
 	{
 		out[j] = *o;
 		*o++;
@@ -37,6 +44,7 @@ int main(int argc , char* argv[])
 	
 	j = 0;
 	
+	//Informação do nome do arquivo de saída
 	printf("\nResultado escrito no arquivo: ");
 	while(j < 20 && out[j] != '\0')
 	{
@@ -45,8 +53,7 @@ int main(int argc , char* argv[])
 	}
 	printf("\n");
 	
-	outfile = fopen(o , "w");
-	
+	// Leitura e cálculo das combinações
 	BIGNUM* A = criar();
 	BIGNUM* B = criar();
 	BIGNUM* R = criar();
@@ -77,6 +84,8 @@ int main(int argc , char* argv[])
 		ler_texto(infile , B);
 		i++;
 	}
+		// Abre arquivo para saída dos dados
+	outfile = fopen(o , "w");
 	escrever_texto(outfile , R);
 	fclose(infile);
 	fclose(outfile);
@@ -84,6 +93,6 @@ int main(int argc , char* argv[])
 	destruir(&A);
 	destruir(&B);
 	destruir(&R);
-	#endif
+
 	return 0;
 }

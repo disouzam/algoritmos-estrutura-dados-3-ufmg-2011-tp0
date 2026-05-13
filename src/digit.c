@@ -1,20 +1,33 @@
+/*****************************************************/
+/* Autor: Dickson Alves de Souza                     */
+/* Aluno do curso de Engenharia Metalúrgica - UFMG   */
+/*                                                   */
+/* Data: 29 de agosto de 2011                        */
+/*                                                   */
+/* TAD digit: implementação                          */
+/*                                                   */
+/*****************************************************/
+
 #include "digit.h"
 
 struct digit
 {
-	char dig_;
-	DIGIT* previous_;
-	DIGIT* next_;
+	char dig_; // Armazena o valor do dígito
+	DIGIT* previous_; // Ponteiro para dígito anterior.
+	DIGIT* next_; // Ponteiro para dígito seguinte
 }; //struct digit
 
 //Construtor: Aloca memória para o struct digit e retorna o ponteiro para um digit inicializado.
 DIGIT* create_digit ()
 {
 	DIGIT* d;
+	
+	// Tentativa de alocar memória para struct digit
 	d = (DIGIT*) malloc(sizeof(struct digit));
 	
 	if (d != NULL)
 	{
+		// Inicializa o dígito
 		set_dig(d,0);
 		set_previous(d,NULL);
 		set_next(d,NULL);
@@ -118,9 +131,11 @@ DIGIT* get_next(DIGIT* d)
 	
 } //DIGIT* get_next(DIGIT* d)
 
-//Destrutor: Libera a memória alocada pelo construtor.
+//Destrutor: Libera a memória alocada pelo construtor. 
+//O valor armazenado na posição aponta por f também é apagado para garantir consistência
 void destruir_digit (DIGIT** f)
 {
+	//Limpa os campos no nó digit
 	(*f)->dig_ = 0;
 	(*f)->previous_ = NULL;
 	(*f)->next_ = NULL;
@@ -142,243 +157,3 @@ void print_info(DIGIT* d)
 	printf("Endereço do dígito seguinte = %p\n", get_next(d));
 	printf("===============================================\n");
 } //void print_info(DIGIT* d)
-
-
-//Função de manutenção do TAD digit. Verifica o bom funcionamento de suas funções.
-void debug_digit()
-{
-	int x = 0;
-	
-	printf("\nExecução de testes para debug do TAD digit\n");
-	
-	//Teste do construtor
-	printf("\nTestes do construtor\n");
-	
-	DIGIT* t = NULL;
-	
-	printf("\n*********** MENSAGEM - início ***********\n"); //Começo da mensagem
-	printf("t = %p\n", t);
-	printf("=========== MENSAGEM - final  ===========\n"); //Fim da mensagem
-	
-	t = create_digit();
-	
-	printf("\n*********** MENSAGEM - início ***********\n"); //Começo da mensagem
-	if (t != NULL)
-	{
-		printf("Alocação bem sucedida\n");
-		printf("t = %p\n", t);
-		printf("t->dig_ = %d\n", t->dig_);
-		printf("t->previous_ = %p\n", t->previous_);
-		printf("t->next_ = %p\n", t->next_);
-	}
-	else
-	{
-		x++;
-		printf("Problema na alocação de memória\n");
-		printf("t = %p\n", t);
-	}
-	printf("=========== MENSAGEM - final  ===========\n"); //Fim da mensagem
-	
-	//Teste do set_dig
-	printf("\nTeste de set_dig\n");
-	
-	set_dig(t , 15);
-	
-	printf("\n*********** MENSAGEM - início ***********\n"); //Começo da mensagem
-	if (t->dig_ == 15)
-	{
-		printf("Alteração do dígito bem sucedida\n");
-		printf("t = %p\n", t);
-		printf("t->dig_ = %d\n", t->dig_);
-		printf("t->previous_ = %p\n", t->previous_);
-		printf("t->next_ = %p\n", t->next_);
-	}
-	else
-	{
-		x++;
-		printf("Problema na função set_dig\n");
-		printf("t = %p\n", t);
-		printf("t->dig_ = %d\n", t->dig_);
-	}
-	printf("=========== MENSAGEM - final  ===========\n"); //Fim da mensagem
-	
-	//Teste do set_previous
-	printf("\nTeste de set_previous\n");
-	
-	DIGIT* u = create_digit();
-	
-	set_previous(t , u);
-	
-	printf("\n*********** MENSAGEM - início ***********\n"); //Começo da mensagem
-	if (t->previous_ == u)
-	{
-		printf("Alteração do ponteiro previous_ bem sucedida\n");
-		printf("t = %p\n", t);
-		printf("t->dig_ = %d\n", t->dig_);
-		printf("u = %p\n", u);
-		printf("t->previous_ = %p\n", t->previous_);
-		printf("t->next_ = %p\n", t->next_);
-	}
-	else
-	{
-		x++;
-		printf("Problema na função set_previous\n");
-		printf("t = %p\n", t);
-		printf("u = %p\n", u);
-		printf("t->previous_ = %p\n", t->previous_);
-	}
-	printf("=========== MENSAGEM - final  ===========\n"); //Fim da mensagem
-	
-	//Teste do set_next
-	printf("\nTeste de set_next\n");
-	
-	DIGIT* v = create_digit();
-	
-	set_next(t , v);
-	
-	printf("\n*********** MENSAGEM - início ***********\n"); //Começo da mensagem
-	if (t->next_ == v)
-	{
-		printf("Alteração do ponteiro next_ bem sucedida\n");
-		printf("t = %p\n", t);
-		printf("t->dig_ = %d\n", t->dig_);
-		printf("t->previous_ = %p\n", t->previous_);
-		printf("v = %p\n", v);
-		printf("t->next_ = %p\n", t->next_);
-	}
-	else
-	{
-		x++;
-		printf("Problema na função set_next\n");
-		printf("t = %p\n", t);
-		printf("v = %p\n", v);
-		printf("t->next_ = %p\n", t->next_);
-	}
-	printf("=========== MENSAGEM - final  ===========\n"); //Fim da mensagem
-	
-	//Teste do destrutor
-	printf("\nTeste do destrutor\n");
-	
-	printf("\n*********** MENSAGEM - início ***********\n"); //Começo da mensagem
-	printf("Ponteiros existentes:\n");
-	printf("t = %p\n", t);
-	printf("u = %p\n", u);
-	printf("v = %p\n", v);
-	
-	destruir_digit(&t);
-	if (t == NULL) 
-	{
-		printf("\nDestruição bem sucedida\n");
-	}
-	else
-	{
-		x++;
-		printf("\nFalha na destruição\n");
-	}
-	printf("t destruído = %p\n", t);
-	
-	destruir_digit(&u);
-	if (u == NULL) 
-	{
-		printf("\nDestruição bem sucedida\n");
-	}
-	else
-	{
-		x++;
-		printf("\nFalha na destruição\n");
-	}
-	printf("u destruído = %p\n", u);
-	
-	destruir_digit(&v);
-	if (v == NULL) 
-	{
-		printf("\nDestruição bem sucedida\n");
-	}
-	else
-	{
-		x++;
-		printf("\nFalha na destruição\n");
-	}
-	printf("v destruído = %p\n", v);
-	printf("=========== MENSAGEM - final  ===========\n"); //Fim da mensagem
-	
-	//Teste de get_dig
-	printf("\nTeste de get_dig\n");
-	
-	DIGIT* a = create_digit();
-	set_dig(a,12);
-	
-	printf("\n*********** MENSAGEM - início ***********\n"); //Começo da mensagem
-	char c = get_dig(a);
-	if (c == 12)
-	{
-		printf("Função acesso get_dig correta\n");
-	}
-	else
-	{
-		x++;
-		printf("Erro na função get_dig\n");
-	}
-	printf("get_dig(a) = %d\n", get_dig(a));
-	printf("c = get_dig(a) = %d\n", c);
-	printf("=========== MENSAGEM - final  ===========\n"); //Fim da mensagem
-	
-	//Teste de get_previous
-	printf("\nTeste de get_previous\n");
-	
-	DIGIT* f = create_digit();
-	DIGIT* g = create_digit();
-	set_previous(f,g);
-	g = NULL;
-	
-	printf("\n*********** MENSAGEM - início ***********\n"); //Começo da mensagem
-	g = get_previous(f);
-	if (g == get_previous(f))
-	{
-		printf("Função acesso get_previous correta\n");
-	}
-	else
-	{
-		x++;
-		printf("Erro na função get_previous\n");
-	}
-	printf("get_previous(f) = %p\n", get_previous(f));
-	printf("g = get_previous(f) = %p\n", g);
-	printf("=========== MENSAGEM - final  ===========\n"); //Fim da mensagem
-	
-	//Teste de get_next
-	printf("\nTeste de get_next\n");
-	
-	DIGIT* h = create_digit();
-	DIGIT* i = create_digit();
-	set_next(h,i);
-	i = NULL;
-	
-	printf("\n*********** MENSAGEM - início ***********\n"); //Começo da mensagem
-	i = get_next(h);
-	if (i == get_next(h))
-	{
-		printf("Função acesso get_next correta\n");
-	}
-	else
-	{
-		x++;
-		printf("Erro na função get_next\n");
-	}
-	printf("get_next(h) = %p\n", get_next(h));
-	printf("i = get_next(h) = %p\n", i);
-	printf("=========== MENSAGEM - final  ===========\n"); //Fim da mensagem
-	
-	//Resultado final do teste
-	if (x != 0)
-	{
-		if (x == 1) printf("\n\nOcorreu 1 falha no TAD digit\n");
-		if (x >= 2) printf("\n\nOcorreram %d falhas no TAD digit\n", x);
-		printf("Verifique mensagens acima para correção\n");
-	}
-	else
-	{
-		printf("\n\nTodos os testes de funcionamento do TAD digit foram bem sucedidos\n");
-		printf("As funções do TAD cumprem os requisitos estabelecidos no arquivo digit.h\n");
-	}
-} //void debug_digit()
