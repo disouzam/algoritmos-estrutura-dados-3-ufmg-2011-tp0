@@ -11,7 +11,6 @@ struct digit
 DIGIT* create_digit ()
 {
 	DIGIT* d;
-	
 	d = (DIGIT*) malloc(sizeof(struct digit));
 	
 	if (d != NULL)

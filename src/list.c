@@ -4,7 +4,7 @@ struct list
 {
 	DIGIT* first_;
 	DIGIT* last_;
-	long int size_;
+	unsigned long int size_;
 }; //struct list
 
 //Construtor: Aloca memória para o struct list e retorna o ponteiro para um list vazio.
@@ -77,7 +77,7 @@ void set_last(LIST* l, DIGIT* new_last)
 } //void set_last(LIST* l, DIGIT* new_last)
 
 //Altera o tamanho da lista atual (em número de dígitos - ou nós da lista encadeada).
-void set_size(LIST* l, long int new_size)
+void set_size(LIST* l, unsigned long int new_size)
 {
 	if (l != NULL)
 	{
@@ -90,7 +90,7 @@ void set_size(LIST* l, long int new_size)
 	}
 	
 	return;
-} //void set_size(LIST* l, long int new_size)
+} //void set_size(LIST* l, unsigned long int new_size)
 
 //Recupera o endereço de memória do primeiro dígito do struct list.
 DIGIT* get_first (LIST* l)
@@ -123,7 +123,7 @@ DIGIT* get_last (LIST* l)
 } //DIGIT* get_last (LIST* l)
 
 //Recupera o tamanho da lista atual (em número de dígitos - ou nós da lista encadeada).
-long int get_size (LIST* l)
+unsigned long int get_size (LIST* l)
 {
 	if (l != NULL)
 	{
@@ -135,14 +135,14 @@ long int get_size (LIST* l)
 		printf("Erro: Ponteiro nulo passado como parâmetro.\n");
 		return (0);
 	}
-} //long int get_size (LIST* l)
+} //unsigned long int get_size (LIST* l)
 
 //Insere um dígito no início da lista encadeada.
 void insert_begin(LIST* l, char d)
 {
 	if (l != NULL)
 	{
-		long int s = get_size(l);
+		unsigned long int s = get_size(l);
 		set_size(l , s + 1);
 		
 		DIGIT* new_digit = NULL;
@@ -206,7 +206,7 @@ void insert_end(LIST* l, char d)
 {
 	if (l != NULL)
 	{
-		long int s = get_size(l);
+		unsigned long int s = get_size(l);
 		set_size(l , s + 1);
 		
 		DIGIT* new_digit;
@@ -279,7 +279,7 @@ void copyAtoB(LIST* A,  LIST* B)
 //Função auxiliar: apaga o dígito apontado pelo ponteiro er (aponta para um ponteiro do tipo DIGIT).
 void erase_digit(LIST* l, DIGIT** er)
 {
-	long int s = get_size(l);
+	unsigned long int s = get_size(l);
 	
 	if (s == 1)
 	{
@@ -348,24 +348,24 @@ void erase_digit(LIST* l, DIGIT** er)
 //Limpa a lista completamente e a deixa vazia.
 void clear_list(LIST* l)
 {
-	DIGIT* temp;
-	temp = get_first(l);
-	while (temp != NULL)
+	if (get_size(l) != 0)
 	{
-		erase_digit(l , &temp);
+		DIGIT* temp;
 		temp = get_first(l);
+		while (temp != NULL)
+		{
+			erase_digit(l , &temp);
+			temp = get_first(l);
+		}
 	}
 	return;
 } //void clear_list(LIST* l)
 
 //Imprime a lista na tela usando o ponto como separador de milhar. 
 //Números gigantes podem requerer a impressão em múltiplas linhas.
-//O flag sci serve para selecionar a impressão ao final do número de sua versão aproximada em notação científica:
-// sci = 0                                        -> Não imprime a notação científica ao final.
-// sci = 1 ou qualquer outro valor diferente de 0 -> Imprime a notação científica ao final.
-void print_list(LIST* l, char sci)
+void print_list(LIST* l)
 {
-	long int s = 0;
+	unsigned long int s = 0;
 	
 	if (l != NULL)
 	{
@@ -409,44 +409,6 @@ void print_list(LIST* l, char sci)
 			}
 		}
 		printf(" ");
-		
-		if (sci == 1)
-		{
-			printf("   Notação científica: ");
-			temp = get_first(l);
-			printf("%d.", get_dig(temp));
-			
-			if (s == 1)
-			{
-				printf("00E0 ");
-			}
-			else
-			{
-				if (s == 2)
-				{
-					temp = get_next(temp);
-					printf("%d0E1 ",get_dig(temp));
-				}
-				else
-				{
-					temp = get_next(temp);
-					printf("%d",get_dig(temp));
-					temp = get_next(temp);
-					printf("%dE%ld",get_dig(temp), s - 1);
-				}
-			}
-		
-		}
-		
-		/*
-		Código para depurar TAD list em caso de falhas.
-		DIGIT* temp = get_first(l);
-		while (temp != NULL)
-		{
-			print_info(temp);
-			temp = get_next(temp);
-		}
-		*/
 	}
 	else
 	{
@@ -646,16 +608,16 @@ void debug_list()
 	printf("get_last = %p\n", get_last(new_list));
 	printf("get_size = %ld\n", get_size(new_list));
 	
-	print_list(new_list , 1);
+	print_list(new_list);
 	
 	//Teste do destrutor da lista
 	printf("\nTeste do destrutor da lista\n");
 	
-	print_list(new_list, 0);
+	print_list(new_list);
 	printf("new_list antes de destruir = %p\n", new_list);
 	destruir_list(&new_list);
 	printf("new_list após destruir = %p\n", new_list);
-	print_list(new_list, 0);
+	print_list(new_list);
 	printf("\n*********** MENSAGEM - início ***********\n"); //Começo da mensagem
 	
 	if (l != NULL)
@@ -673,7 +635,7 @@ void debug_list()
 	
 	LIST* new_list2 = create_list();
 	//LIST* new_list3 = create_list();
-	long int j;
+	unsigned long int j;
 	
 	for(j = 0; j < 1000000; j++)
 	{
@@ -682,7 +644,7 @@ void debug_list()
 		if (j%100000 == 0)
 		{
 			printf("newlist2 - size = %ld\n", get_size(new_list2));
-			print_list(new_list2, 1);
+			print_list(new_list2);
 			printf("\n\n");
 			//print_list(new_list3, 1);
 			//printf("\n Ponteiro antes de clear_list %p\n", new_list3);
